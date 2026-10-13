@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Taskcal Pro — Task & Calendar Manager</title>
+<style>
+:root{--bg:#f3f5f9;--surface:#fff;--surface2:#eef1f7;--text:#172033;--muted:#68738a;--line:#dbe0ea;--primary:#4657d9;--primary2:#3347c7;--good:#24956e;--warn:#c27a16;--danger:#d34a5c;--shadow:0 8px 30px rgba(27,38,65,.08);--radius:14px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.app{max-width:1450px;margin:auto;padding:18px}.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.brand{font-size:26px;font-weight:800;letter-spacing:-.04em}.quick{flex:1;min-width:220px}
+input,select,textarea{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+button{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 12px}.primary{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}.danger{color:var(--danger)}
+.toolbar,.panel,.calendar,.side,.stat,.modal-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.toolbar{padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.toolbar .grow{flex:1}.toolbar-group{display:flex;gap:6px;align-items:center}.view button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}.stat{padding:13px}.stat b{display:block;font-size:24px}.stat span{color:var(--muted);font-size:12px}.stat.bad b{color:var(--danger)}.stat.good b{color:var(--good)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px}.calendar{overflow:hidden}.cal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}.cal-head h2{margin:0;font-size:20px}.nav{display:flex;gap:6px}.dow,.grid{display:grid;grid-template-columns:repeat(7,1fr)}.dow span{padding:9px;text-align:center;color:var(--muted);font-weight:700;font-size:12px;border-bottom:1px solid var(--line)}
+.cell{height:142px;min-height:0;padding:7px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;cursor:pointer;overflow:hidden;display:flex;flex-direction:column}.cell:nth-child(7n){border-right:0}.cell.off{background:var(--surface2);opacity:.65}.cell.selected{box-shadow:inset 0 0 0 2px var(--primary)}.date-row{display:flex;align-items:center;gap:5px;margin-bottom:5px;flex:0 0 25px}.day{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-weight:700}.today .day{background:var(--primary);color:#fff}.count{margin-left:auto;color:var(--muted);font-size:11px}.cell-tasks{min-height:0;flex:1;overflow:hidden}.chip{height:22px;line-height:16px;padding:3px 6px;margin:3px 0;border-radius:6px;background:var(--surface2);border-left:3px solid var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}.chip.high{border-color:var(--danger)}.chip.med{border-color:var(--warn)}.chip.low{border-color:var(--good)}.chip.done{text-decoration:line-through;opacity:.55}.more{height:18px;line-height:18px;font-size:11px;color:var(--primary);font-weight:700;padding-left:5px;flex:0 0 18px}
+.side{padding:15px;min-width:0}.side-head{display:flex;justify-content:space-between;gap:8px;align-items:start}.side h3{margin:0;font-size:19px}.muted{color:var(--muted)}.progress{height:7px;background:var(--surface2);border-radius:8px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;background:var(--good)}.task-list{margin-top:8px}.task{display:grid;grid-template-columns:28px 55px 1fr 28px;gap:7px;padding:10px 4px;border-top:1px solid var(--line);cursor:pointer}.check{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid var(--primary);display:grid;place-items:center}.task.done .check{background:var(--good);border-color:var(--good);color:#fff}.task.done .title{text-decoration:line-through;opacity:.6}.time{font-size:11px;color:var(--muted);padding-top:3px}.title{font-weight:700;overflow-wrap:anywhere}.notes{font-size:11px;color:var(--muted);margin-top:2px}.tag{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:1px 6px;margin:3px 3px 0 0;font-size:10px;color:var(--muted)}.task .delete{border:0;background:none;padding:0;color:var(--muted);font-size:17px}
+.list-view{padding:0}.section-title{padding:10px 14px;background:var(--surface2);font-weight:800;border-top:1px solid var(--line)}.empty{text-align:center;color:var(--muted);padding:28px 10px}.hidden{display:none!important}
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.panel{padding:15px}.panel h3{margin:0 0 12px}.bar{height:9px;background:var(--surface2);border-radius:8px;overflow:hidden;margin:6px 0 10px}.bar span{display:block;height:100%;background:var(--primary)}.row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}.legend{font-size:12px;color:var(--muted)}
+dialog{border:0;padding:0;background:transparent;max-width:min(620px,94vw);width:100%}dialog::backdrop{background:rgba(12,18,32,.55)}.modal-box{padding:20px}.modal-box h2{margin:0 0 15px}.form{display:grid;grid-template-columns:1fr 1fr;gap:11px}.full{grid-column:1/-1}.form label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.actions .push{margin-right:auto}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#182033;color:#fff;padding:10px 15px;border-radius:9px;display:none;z-index:20}.toast.show{display:block}
+.dark{--bg:#101521;--surface:#192131;--surface2:#222b3e;--text:#edf1f8;--muted:#99a4ba;--line:#303a50;--shadow:0 8px 30px rgba(0,0,0,.22)}
+.sync{font-size:11px;color:var(--muted);margin-bottom:10px}.sync.ok{color:var(--good)}.sync.bad{color:var(--danger)}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.side{order:2}}
+@media(max-width:650px){.app{padding:10px}.stats{grid-template-columns:repeat(2,1fr)}.dashboard{grid-template-columns:1fr}.cell{height:92px;padding:4px}.date-row{flex-basis:22px;margin-bottom:2px}.day{width:22px;height:22px}.chip{height:18px;line-height:13px;font-size:10px;padding:2px 5px;margin:2px 0}.more{height:16px;line-height:16px;flex-basis:16px}.form{grid-template-columns:1fr}.full{grid-column:auto}.hide-mobile{display:none}.task{grid-template-columns:28px 45px 1fr 25px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">Taskcal Pro</div>
+  <input id="quick" class="quick" placeholder='Quick add: "Dentist tomorrow 3pm !"'>
+  <button class="primary" id="newBtn">+ New task</button>
+  <button id="googleBtn">☁ Google Sheets</button><button id="themeBtn">Theme</button>
+</header>
+
+<div id="sync" class="sync">Local storage enabled</div>
+
+<section class="toolbar">
+  <div class="toolbar-group"><button id="prev">‹</button><button id="today">Today</button><button id="next">›</button></div>
+  <div id="period" class="grow" style="font-weight:800;font-size:18px"></div>
+  <div class="toolbar-group view" id="views"><button data-view="month">Month</button><button data-view="week">Week</button><button data-view="list">List</button><button data-view="dashboard">Dashboard</button></div>
+  <input id="search" style="max-width:180px" placeholder="Search tasks">
+  <select id="catFilter" style="max-width:150px"></select>
+  <select id="priFilter" style="max-width:130px"><option value="">Any priority</option><option value="1">High</option><option value="2">Medium</option><option value="3">Low</option></select>
+  <select id="statusFilter" style="max-width:140px"><option value="">All status</option><option value="open">Open</option><option value="done">Completed</option><option value="overdue">Overdue</option></select>
+</section>
+
+<section class="stats" id="stats"></section>
+
+<div id="mainLayout" class="layout">
+  <section class="calendar" id="calendar"></section>
+  <aside class="side" id="side"></aside>
+</div>
+
+<section id="dashboard" class="dashboard hidden"></section>
+
+<dialog id="dialog">
+<div class="modal-box">
+  <h2 id="modalTitle">New task</h2>
+  <div class="form">
+    <div class="full"><label>Title</label><input id="fTitle" maxlength="160"></div>
+    <div><label>Date</label><input type="date" id="fDate"></div>
+    <div><label>Time</label><input type="time" id="fTime"></div>
+    <div><label>Priority</label><select id="fPri"><option value="1">High</option><option value="2" selected>Medium</option><option value="3">Low</option></select></div>
+    <div><label>Category</label><select id="fCat"></select></div>
+    <div><label>Repeat</label><select id="fRepeat"><option value="none">Does not repeat</option><option value="daily">Every day</option><option value="weekdays">Every weekday</option><option value="weekly">Every week</option><option value="monthly">Every month</option></select></div>
+    <div><label>End repeat (optional)</label><input type="date" id="fEnd"></div>
+    <div class="full"><label>Notes</label><textarea id="fNotes" rows="4"></textarea></div>
+  </div>
+  <div id="repeatHint" class="muted" style="font-size:12px;margin-top:8px"></div>
+  <div class="actions"><button class="danger push" id="deleteBtn">Delete series</button><button class="danger" id="skipBtn" style="display:none">Skip this day</button><button id="cancelBtn">Cancel</button><button class="primary" id="saveBtn">Save task</button></div>
+</div>
+</dialog>
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=String(s).split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=t=>{if(!t)return"Any time";let [h,m]=t.split(":").map(Number),p=h>=12?"PM":"AM";h=h%12||12;return `${h}:${pad(m)} ${p}`};
+const CATS={Work:"#4657d9",Personal:"#d34a5c",Health:"#24956e",Study:"#b4731a",Finance:"#7a5bd6",Other:"#7a8199"};
+const PRI={1:"High",2:"Medium",3:"Low"};
+const REP={daily:"Daily",weekdays:"Weekdays",weekly:"Weekly",monthly:"Monthly"};
+
+let tasks=[],view="month",cur=new Date(),selected=ymd(new Date()),editingId=null,editingOccurrenceDate=null;
+let filters={q:"",cat:"",pri:"",status:""};
+const DBKEY="taskcal.pro.v2", THEMEKEY="taskcal.pro.theme";
+
+/*
+  STORAGE MODE
+  ------------
+  Set GOOGLE_SCRIPT_URL after deploying the Google Apps Script included with this app.
+  The app uses Google Sheets as the shared source of truth and localStorage as a cache.
+*/
+const GOOGLE_SCRIPT_URL = localStorage.getItem("taskcal.googleScriptUrl") || "";
+const SYNC_INTERVAL_MS = 10000;
+let syncBusy=false, syncTimer=null;
+
+function cacheSave(){
+  try{localStorage.setItem(DBKEY,JSON.stringify(tasks));}
+  catch(e){}
+}
+function cacheLoad(){
+  try{
+    const r=localStorage.getItem(DBKEY);
+    if(r) tasks=JSON.parse(r).map(normalize);
+  }catch(e){tasks=[]}
+}
+function save(changedId=null){
+  cacheSave();
+  if(!GOOGLE_SCRIPT_URL){
+    setSync("Local cache only — connect Google Sheets in Settings","bad");
+    return;
+  }
+  if(changedId){
+    const t=tasks.find(x=>x.id===changedId);
+    if(t) syncTaskToGoogle(t);
+    else deleteTaskFromGoogle(changedId);
+  }else{
+    syncToGoogle();
+  }
+}
+async function syncTaskToGoogle(t){
+  if(!GOOGLE_SCRIPT_URL||syncBusy)return;
+  syncBusy=true;
+  try{
+    const row={
+      id:t.id,title:t.title,date:t.date,time:t.time,pri:t.pri,cat:t.cat,repeat:t.repeat,
+      end:t.end,notes:t.notes,done:JSON.stringify(t.done||{}),skipped:JSON.stringify(t.skipped||{}),
+      created:t.created||Date.now(),updated:Date.now()
+    };
+    const r=await jsonp({action:"upsertTask",payload:encodeURIComponent(JSON.stringify(row))});
+    if(!r.ok)throw new Error(r.error||"Google Sheets save failed");
+    cacheSave();
+    setSync("Saved to Google Sheets • "+tasks.length+" tasks","ok");
+  }catch(e){
+    setSync("Save failed • changes kept locally","bad");
+    toast("Google Sheets save failed; local copy retained");
+  }finally{syncBusy=false}
+}
+async function deleteTaskFromGoogle(id){
+  if(!GOOGLE_SCRIPT_URL||syncBusy)return;
+  syncBusy=true;
+  try{
+    const r=await jsonp({action:"deleteTask",id});
+    if(!r.ok)throw new Error(r.error||"Google Sheets delete failed");
+    setSync("Deleted from Google Sheets • "+tasks.length+" tasks","ok");
+  }catch(e){
+    setSync("Delete sync failed • local change kept","bad");
+    toast("Google Sheets delete failed");
+  }finally{syncBusy=false}
+}
+function load(){
+  cacheLoad();
+  if(GOOGLE_SCRIPT_URL) fetchFromGoogle(true);
+  else setSync("Local cache only — connect Google Sheets in Settings","bad");
+}
+function jsonp(params){
+  return new Promise((resolve,reject)=>{
+    const cb="taskcal_cb_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+    const script=document.createElement("script");
+    const q=new URLSearchParams({...params,callback:cb});
+    const timer=setTimeout(()=>{cleanup();reject(new Error("Google Sheets request timed out"))},15000);
+    function cleanup(){clearTimeout(timer);delete window[cb];script.remove()}
+    window[cb]=data=>{cleanup();resolve(data)};
+    script.onerror=()=>{cleanup();reject(new Error("Could not connect to Google Sheets"))};
+    script.src=GOOGLE_SCRIPT_URL+"?"+q.toString();
+    document.body.appendChild(script);
+  });
+}
+function taskRows(){
+  return tasks.map(t=>({
+    id:t.id,title:t.title,date:t.date,time:t.time,pri:t.pri,cat:t.cat,repeat:t.repeat,
+    end:t.end,notes:t.notes,done:JSON.stringify(t.done||{}),skipped:JSON.stringify(t.skipped||{}),
+    created:t.created||Date.now(),updated:Date.now()
+  }));
+}
+async function fetchFromGoogle(silent=false){
+  if(!GOOGLE_SCRIPT_URL||syncBusy)return;
+  syncBusy=true;
+  try{
+    const r=await jsonp({action:"getTasks"});
+    if(!r.ok)throw new Error(r.error||"Google Sheets error");
+    const remote=(r.tasks||[]).map(normalize);
+    if(remote.length===0 && tasks.length>0){
+      // First-time migration: preserve existing local tasks by uploading them.
+      await syncToGoogle();
+      return;
+    }
+    tasks=remote;
+    cacheSave();
+    setSync("Google Sheets synced • "+tasks.length+" tasks","ok");
+    render();
+  }catch(e){
+    setSync("Google Sheets unavailable • using local cache","bad");
+    if(!silent)toast("Could not sync with Google Sheets");
+  }finally{syncBusy=false}
+}
+async function syncToGoogle(){
+  if(!GOOGLE_SCRIPT_URL||syncBusy)return;
+  syncBusy=true;
+  try{
+    const r=await jsonp({
+      action:"saveAll",
+      payload:encodeURIComponent(JSON.stringify(taskRows()))
+    });
+    if(!r.ok)throw new Error(r.error||"Google Sheets save failed");
+    cacheSave();
+    setSync("Saved to Google Sheets • "+tasks.length+" tasks","ok");
+  }catch(e){
+    setSync("Save failed • changes kept locally","bad");
+    toast("Google Sheets save failed; local copy retained");
+  }finally{syncBusy=false}
+}
+function startAutoSync(){
+  if(syncTimer)clearInterval(syncTimer);
+  if(!GOOGLE_SCRIPT_URL)return;
+  syncTimer=setInterval(()=>fetchFromGoogle(true),SYNC_INTERVAL_MS);
+}
+function connectGoogle(){
+  const current=localStorage.getItem("taskcal.googleScriptUrl")||"";
+  const url=prompt("Paste your deployed Google Apps Script Web App URL:",current);
+  if(url===null)return;
+  const clean=url.trim().replace(/\/$/,"");
+  if(!clean){localStorage.removeItem("taskcal.googleScriptUrl");toast("Google Sheets disconnected");location.reload();return}
+  try{new URL(clean)}catch(e){toast("That is not a valid Web App URL");return}
+  localStorage.setItem("taskcal.googleScriptUrl",clean);
+  location.reload();
+}
+function normalize(t){
+  let done=t.done||{}, skipped=t.skipped||{};
+  try{if(typeof done==="string")done=JSON.parse(done)||{}}catch(e){done={}}
+  try{if(typeof skipped==="string")skipped=JSON.parse(skipped)||{}}catch(e){skipped={}}
+  return {id:t.id||uid(),title:String(t.title||"Untitled"),date:t.date||ymd(new Date()),time:t.time||"",pri:Number(t.pri)||2,cat:CATS[t.cat]?t.cat:"Other",repeat:REP[t.repeat]?t.repeat:"none",end:t.end||"",notes:String(t.notes||""),done,skipped,created:t.created||Date.now()};
+}
+function setSync(m,c){$("#sync").textContent=m;$("#sync").className="sync "+(c||"")}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("show"),2500)}
+
+function occurs(t,ds){
+  if(ds<t.date)return false;
+  if(t.skipped&&t.skipped[ds])return false;
+  if(t.end&&ds>t.end)return false;
+  const a=parse(t.date),b=parse(ds),diff=Math.round((b-a)/86400000);
+  if(t.repeat==="daily")return true;
+  if(t.repeat==="weekdays")return b.getDay()>=1&&b.getDay()<=5;
+  if(t.repeat==="weekly")return diff%7===0;
+  if(t.repeat==="monthly"){
+    const last=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();
+    return b.getDate()===Math.min(a.getDate(),last);
+  }
+  return ds===t.date;
+}
+function matches(t,ds){
+  const q=filters.q;
+  if(q&&!(`${t.title} ${t.notes} ${t.cat} ${PRI[t.pri]}`.toLowerCase().includes(q)))return false;
+  if(filters.cat&&t.cat!==filters.cat)return false;
+  if(filters.pri&&String(t.pri)!==filters.pri)return false;
+  const done=!!t.done[ds], overdue=t.repeat==="none"&&t.date<ymd(new Date())&&!t.done[t.date];
+  if(filters.status==="open"&&done)return false;
+  if(filters.status==="done"&&!done)return false;
+  if(filters.status==="overdue"&&!overdue)return false;
+  return true;
+}
+function tasksOn(ds,raw=false){
+  return tasks.filter(t=>occurs(t,ds)&&(raw||matches(t,ds))).sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99")||a.pri-b.pri||a.title.localeCompare(b.title));
+}
+function completionRate(){
+  let total=0,done=0;
+  for(let i=0;i<30;i++){const ds=ymd(addDays(new Date(),-i));const l=tasksOn(ds,true);l.forEach(t=>{total++;if(t.done[ds])done++})}
+  return total?Math.round(done/total*100):0;
+}
+function stats(){
+  const today=ymd(new Date()),todayTasks=tasksOn(today,true);
+  const done=todayTasks.filter(t=>t.done[today]).length;
+  const overdue=tasks.filter(t=>t.repeat==="none"&&t.date<today&&!t.done[t.date]).length;
+  let next=0;for(let i=1;i<=7;i++)next+=tasksOn(ymd(addDays(new Date(),i)),true).filter(t=>!t.done[ymd(addDays(new Date(),i))]).length;
+  const open=tasks.filter(t=>!t.done[t.date]).length;
+  $("#stats").innerHTML=`
+    <div class="stat"><b>${done}/${todayTasks.length}</b><span>Done today</span></div>
+    <div class="stat ${overdue?"bad":""}"><b>${overdue}</b><span>Overdue</span></div>
+    <div class="stat"><b>${next}</b><span>Due next 7 days</span></div>
+    <div class="stat"><b>${open}</b><span>Task records</span></div>
+    <div class="stat good"><b>${completionRate()}%</b><span>30-day completion</span></div>
+    <div class="stat"><b>${tasks.length}</b><span>Total tasks</span></div>`;
+}
+function taskHtml(t,ds,showDate=false){
+  const done=!!t.done[ds];
+  return `<div class="task ${done?"done":""}" data-id="${esc(t.id)}" data-date="${ds}">
+    <button class="check" data-action="check">${done?"✓":""}</button>
+    <div class="time">${t.time?fmt(t.time):(showDate?parse(ds).toLocaleDateString(undefined,{month:"short",day:"numeric"}):"Any time")}</div>
+    <div><div class="title">${esc(t.title)}</div><span class="tag">${esc(t.cat)}</span><span class="tag">${PRI[t.pri]}</span>${t.repeat!=="none"?`<span class="tag">${REP[t.repeat]}${t.end?" until "+t.end:""}</span>`:""}${t.notes?`<div class="notes">${esc(t.notes)}</div>`:""}</div>
+    <button class="delete" data-action="delete" aria-label="Delete or skip occurrence" title="Delete task / skip this occurrence">×</button>
+  </div>`;
+}
+function chip(t,ds){return `<div class="chip ${t.pri===1?"high":t.pri===2?"med":"low"} ${t.done[ds]?"done":""}" data-id="${esc(t.id)}" data-date="${ds}" title="${esc(t.title)}">${t.time?`<b>${fmt(t.time)}</b> `:""}${esc(t.title)}</div>`}
+
+function renderPeriod(){
+  $("#views").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+  let title="";
+  if(view==="month")title=cur.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  else if(view==="week"){const s=addDays(cur,-((cur.getDay()+6)%7)),e=addDays(s,6);title=`${s.toLocaleDateString(undefined,{month:"short",day:"numeric"})} – ${e.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}`}
+  else title=view==="list"?"Next 30 days":"Progress dashboard";
+  $("#period").textContent=title;
+}
+function renderCalendar(){
+  const c=$("#calendar");
+  if(view==="list"){renderList();return}
+  if(view==="dashboard"){c.classList.add("hidden");return}else c.classList.remove("hidden");
+  const wk=view==="week",base=wk?cur:new Date(cur.getFullYear(),cur.getMonth(),1),start=addDays(base,-((base.getDay()+6)%7)),count=wk?7:42;
+  let h=`<div class="cal-head"><h2>${wk?"Week":"Calendar"}</h2><span class="muted">${wk?"Click a task to edit":"Double-click a day to add"}</span></div><div class="dow">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(x=>`<span>${x}</span>`).join("")}</div><div class="grid">`;
+  for(let i=0;i<count;i++){
+    const d=addDays(start,i),ds=ymd(d),list=tasksOn(ds),off=!wk&&d.getMonth()!==cur.getMonth();
+    h+=`<div class="cell ${off?"off ":""}${ds===selected?"selected ":""}${ds===ymd(new Date())?"today":""}" data-date="${ds}">
+      <div class="date-row"><span class="day">${d.getDate()}</span>${list.length?`<span class="count">${list.length}</span>`:""}</div>
+      <div class="cell-tasks">${list.slice(0,wk?6:4).map(t=>chip(t,ds)).join("")}</div>${list.length>(wk?6:4)?`<div class="more">+${list.length-(wk?6:4)} more</div>`:""}
+    </div>`;
+  }
+  c.innerHTML=h+"</div>";
+}
+function renderList(){
+  const c=$("#calendar");let h=`<div class="cal-head"><h2>Upcoming tasks</h2></div>`;
+  let any=false;
+  for(let i=0;i<30;i++){const ds=ymd(addDays(new Date(),i)),list=tasksOn(ds);if(!list.length)continue;any=true;h+=`<div class="section-title">${i===0?"Today":i===1?"Tomorrow":parse(ds).toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}</div>`+list.map(t=>taskHtml(t,ds)).join("")}
+  const overdue=tasks.filter(t=>t.repeat==="none"&&t.date<ymd(new Date())&&!t.done[t.date]&&matches(t,t.date));
+  if(overdue.length)h=`<div class="section-title" style="color:var(--danger)">Overdue</div>`+overdue.map(t=>taskHtml(t,t.date,true)).join("")+h;
+  c.innerHTML=h+(any||overdue.length?"":"<div class=\"empty\">No matching tasks.</div>");
+}
+function renderSide(){
+  const l=tasksOn(selected),done=l.filter(t=>t.done[selected]).length;
+  $("#side").innerHTML=`<div class="side-head"><div><h3>${parse(selected).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</h3><div class="muted">${done} of ${l.length} completed</div></div><button class="primary" data-add="${selected}">+ Add</button></div>
+  <div class="progress"><span style="width:${l.length?done/l.length*100:0}%"></span></div>
+  <div class="task-list">${l.length?l.map(t=>taskHtml(t,selected)).join(""):"<div class=\"empty\">Nothing planned for this day.</div>"}</div>`;
+}
+function renderDashboard(){
+  if(view!=="dashboard"){$("#dashboard").classList.add("hidden");return}
+  $("#dashboard").classList.remove("hidden");
+  const byCat={};Object.keys(CATS).forEach(c=>byCat[c]=0);tasks.forEach(t=>byCat[t.cat]=(byCat[t.cat]||0)+1);
+  const max=Math.max(1,...Object.values(byCat));
+  let h=`<div class="panel"><h3>Workload by category</h3>${Object.entries(byCat).map(([c,n])=>`<div class="row"><span>${c}</span><b>${n}</b></div><div class="bar"><span style="width:${n/max*100}%"></span></div>`).join("")}</div>`;
+  let open=0,done=0,high=0;tasks.forEach(t=>{if(t.done[t.date])done++;else open++;if(t.pri===1)high++});
+  h+=`<div class="panel"><h3>Task health</h3><div class="row"><span>Open task records</span><b>${open}</b></div><div class="row"><span>Completed task records</span><b>${done}</b></div><div class="row"><span>High priority</span><b>${high}</b></div><div class="row"><span>30-day completion</span><b>${completionRate()}%</b></div></div>`;
+  h+=`<div class="panel"><h3>Next 7 days</h3>${Array.from({length:7},(_,i)=>{const ds=ymd(addDays(new Date(),i)),l=tasksOn(ds,true),d=l.filter(t=>t.done[ds]).length;return `<div class="row"><span>${parse(ds).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><b>${d}/${l.length}</b></div>`}).join("")}</div>`;
+  h+=`<div class="panel"><h3>Productivity</h3><p class="legend">Completion is calculated from occurrences in the last 30 days, including recurring tasks.</p><div class="bar"><span style="width:${completionRate()}%"></span></div><b>${completionRate()}% completion rate</b></div>`;
+  $("#dashboard").innerHTML=h;
+}
+function render(){renderPeriod();stats();renderCalendar();renderSide();renderDashboard()}
+
+function openTask(id,date=selected){
+  editingId=id||null;
+  editingOccurrenceDate=date;
+  const t=id?tasks.find(x=>x.id===id):{title:"",date,time:"",pri:2,cat:"Work",repeat:"none",end:"",notes:""};
+  $("#modalTitle").textContent=id?"Edit task":"New task";
+  $("#fTitle").value=t.title;
+  // For a recurring task, retain the series start date in the editor.
+  // The exact clicked occurrence is stored separately for Skip this day.
+  $("#fDate").value=t.date||date;
+  $("#fTime").value=t.time||"";
+  $("#fPri").value=t.pri||2;
+  $("#fCat").value=t.cat||"Work";
+  $("#fRepeat").value=t.repeat||"none";
+  $("#fEnd").value=t.end||"";
+  $("#fNotes").value=t.notes||"";
+  $("#deleteBtn").style.display=id?"":"none";
+  $("#skipBtn").style.display=(id&&t.repeat!=="none")?"":"none";
+  $("#repeatHint").textContent=t.repeat!=="none"
+    ? "This is a recurring series. “Skip this day” affects only "+date+". Editing and deleting the series affects all occurrences."
+    : "";
+  $("#dialog").showModal();
+  $("#fTitle").focus();
+}
+function saveTask(){
+  const title=$("#fTitle").value.trim();if(!title){toast("Enter a task title");$("#fTitle").focus();return}
+  const o={title,date:$("#fDate").value||selected,time:$("#fTime").value,pri:+$("#fPri").value,cat:$("#fCat").value,repeat:$("#fRepeat").value,end:$("#fEnd").value,notes:$("#fNotes").value.trim()};
+  if(o.repeat==="none")o.end="";
+  if(o.end&&o.end<o.date){toast("Repeat end date cannot be before the start date");return}
+  if(editingId){const t=tasks.find(x=>x.id===editingId);Object.assign(t,o)}
+  else tasks.push({id:uid(),...o,done:{},skipped:{},created:Date.now()});
+  selected=o.date;cur=parse(o.date);const changedId=editingId||tasks[tasks.length-1].id;save(changedId);$("#dialog").close();render();toast(editingId?"Task updated":"Task added")
+}
+function skipOccurrence(id,ds){
+  const t=tasks.find(x=>x.id===id);
+  if(!t||t.repeat==="none"||!ds)return;
+  t.skipped=t.skipped||{};
+  t.skipped[ds]=true;
+  if(t.done) delete t.done[ds];
+  save(t.id);
+  $("#dialog").close();
+  render();
+  toast("Skipped only "+parse(ds).toLocaleDateString(undefined,{month:"short",day:"numeric"}));
+}
+function deleteTask(id){
+  const i=tasks.findIndex(t=>t.id===id);
+  if(i<0)return;
+  tasks.splice(i,1);
+  cacheSave();
+  if(GOOGLE_SCRIPT_URL) deleteTaskFromGoogle(id);
+  else setSync("Deleted locally","ok");
+  render();
+  toast("Task deleted");
+}
+function toggleDone(id,ds){
+  const t=tasks.find(x=>x.id===id);if(!t)return;t.done[ds]=!t.done[ds];save(t.id);render()
+}
+function quickAdd(s){
+  let x=s.trim(),date=selected,time="",pri=2;
+  let m;
+  if(/\btomorrow\b/i.test(x)){date=ymd(addDays(new Date(),1));x=x.replace(/\btomorrow\b/i,"")}
+  else if(/\btoday\b/i.test(x)){date=ymd(new Date());x=x.replace(/\btoday\b/i,"")}
+  m=x.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i);
+  if(m){let h=+m[1]%12;if(m[3].toLowerCase()==="pm")h+=12;time=pad(h)+":"+(m[2]||"00");x=x.replace(m[0],"")}
+  else if((m=x.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/))){time=pad(+m[1])+":"+m[2];x=x.replace(m[0],"")}
+  if(/!/.test(x)){pri=1;x=x.replace(/!+/g,"")}
+  x=x.replace(/\s+/g," ").trim();if(!x)return false;
+  const qt={id:uid(),title:x,date,time,pri,cat:"Personal",repeat:"none",end:"",notes:"",done:{},skipped:{},created:Date.now()};tasks.push(qt);selected=date;cur=parse(date);save(qt.id);render();toast("Task added");return true
+}
+function exportJson(){const blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="taskcal-backup.json";a.click();URL.revokeObjectURL(a.href)}
+function importJson(file){const r=new FileReader();r.onload=()=>{try{const incoming=JSON.parse(r.result);if(!Array.isArray(incoming))throw 0;const map=new Map(tasks.map(t=>[t.id,t]));incoming.map(normalize).forEach(t=>map.set(t.id,t));tasks=[...map.values()];save();render();toast(`Imported ${incoming.length} tasks`)}catch(e){toast("Invalid Taskcal backup")}};r.readAsText(file)}
+
+function setup(){
+  load();
+  $("#fCat").innerHTML=Object.keys(CATS).map(c=>`<option>${c}</option>`).join("");
+  $("#catFilter").innerHTML=`<option value="">All categories</option>`+Object.keys(CATS).map(c=>`<option>${c}</option>`).join("");
+  const th=localStorage.getItem(THEMEKEY);if(th==="dark")document.body.classList.add("dark");
+  $("#googleBtn").onclick=connectGoogle;
+  $("#newBtn").onclick=()=>openTask(null,selected);$("#saveBtn").onclick=saveTask;$("#cancelBtn").onclick=()=>$("#dialog").close();
+  $("#deleteBtn").onclick=()=>{if(editingId&&confirm("Delete the entire recurring series?")){$("#dialog").close();deleteTask(editingId)}};
+  $("#skipBtn").onclick=()=>{if(editingId&&editingOccurrenceDate)skipOccurrence(editingId,editingOccurrenceDate)};
+  $("#quick").onkeydown=e=>{if(e.key==="Enter"&&quickAdd(e.target.value))e.target.value=""};
+  $("#themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem(THEMEKEY,document.body.classList.contains("dark")?"dark":"light")};
+  $("#views").onclick=e=>{if(e.target.dataset.view){view=e.target.dataset.view;render()}};
+  $("#prev").onclick=()=>{if(view==="month")cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);else cur=addDays(cur,-7);render()};
+  $("#next").onclick=()=>{if(view==="month")cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);else cur=addDays(cur,7);render()};
+  $("#today").onclick=()=>{cur=new Date();selected=ymd(cur);render()};
+  $("#search").oninput=e=>{filters.q=e.target.value.toLowerCase();render()};
+  $("#catFilter").onchange=e=>{filters.cat=e.target.value;render()};
+  $("#priFilter").onchange=e=>{filters.pri=e.target.value;render()};
+  $("#statusFilter").onchange=e=>{filters.status=e.target.value;render()};
+  $("#calendar").addEventListener("click",e=>{
+    const task=e.target.closest(".task,.chip"),cell=e.target.closest(".cell");
+    if(e.target.closest("[data-action=check]")&&task){toggleDone(task.dataset.id,task.dataset.date);return}
+    if(e.target.closest("[data-action=delete]")&&task){
+      const t=tasks.find(x=>x.id===task.dataset.id), ds=task.dataset.date;
+      if(!t)return;
+      if(t.repeat!=="none"){
+        if(confirm("Skip this occurrence only?\\n\\nThe task will remain on all other dates."))skipOccurrence(t.id,ds);
+      }else{
+        if(confirm("Delete this task?"))deleteTask(t.id);
+      }
+      return
+    }
+    if(task){openTask(task.dataset.id,task.dataset.date);return}
+    if(cell){selected=cell.dataset.date;render()}
+  });
+  $("#calendar").addEventListener("dblclick",e=>{const cell=e.target.closest(".cell");if(cell)openTask(null,cell.dataset.date)});
+  $("#side").addEventListener("click",e=>{
+    const add=e.target.closest("[data-add]");if(add){openTask(null,add.dataset.add);return}
+    const task=e.target.closest(".task");if(!task)return;
+    if(e.target.closest("[data-action=check]"))toggleDone(task.dataset.id,task.dataset.date);
+    else if(e.target.closest("[data-action=delete]")){
+      const t=tasks.find(x=>x.id===task.dataset.id), ds=task.dataset.date;
+      if(!t)return;
+      if(t.repeat!=="none"){
+        if(confirm("Skip this occurrence only?\\n\\nThe task will remain on all other dates."))skipOccurrence(t.id,ds);
+      }else{
+        if(confirm("Delete this task?"))deleteTask(t.id);
+      }
+    }else openTask(task.dataset.id,task.dataset.date);
+  });
+  document.addEventListener("keydown",e=>{
+    if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)||$("#dialog").open)return;
+    if(e.key.toLowerCase()==="n"){e.preventDefault();openTask(null,selected)}
+    if(e.key==="ArrowLeft")$("#prev").click();if(e.key==="ArrowRight")$("#next").click();
+  });
+  render();
+  startAutoSync();
+}
+setup();
+</script>
+</body>
+</html>
